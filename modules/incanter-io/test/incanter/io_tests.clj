@@ -89,3 +89,10 @@
   (is (= ", 1, 2, 3\n1, 6, 5, 4\n"
          (csv-table {1 {1 6, 2 5, 3 4}}))))
 
+(comment (deftest pedantry
+	(let [output-string (java.io.StringWriter.)]
+		(save-pedantic-internal
+			(with-data test-csv-data ($where {:speed {:lt 5}}))
+			output-string
+			:quote-char \')
+			(. (. output-string getBuffer) toString))))

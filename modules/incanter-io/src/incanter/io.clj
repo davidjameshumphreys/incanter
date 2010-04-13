@@ -58,7 +58,7 @@ http://stackoverflow.com/questions/613929/how-do-i-connect-to-a-mysql-database-f
 incanter.io
   ;(:gen-class)
   (:import (java.io FileReader FileWriter File)
-           (au.com.bytecode.opencsv CSVReader))
+           (au.com.bytecode.opencsv CSVReader CSVWriter))
   (:use [incanter.core :only (dataset save)])
   (:use [org.danlarkin.json 
 	 :only [decode-from-reader decode-from-str encode-to-str]])
@@ -184,6 +184,44 @@ incanter.io
       (.flush file-writer)
       (.close file-writer))))
 
+(defn save-pedantic-internal [
+  #^incanter.core/dataset dataset
+  #^java.io.Writer output-w
+  & options]
+  (let [opts (when options (apply assoc {} options))
+        columns (:column-names dataset)
+        quote-char (or (:quote-char opts) \")
+        delim (or (:delim opts) \,)
+        column-string-fns (or (:string-fns opts) {})
+        str-fn #(str %)]
+        (with-open [csv-w (CSVWriter. output-w delim quote-char)]
+			    (do
+			      (. csv-w writeNext (into-array String (map #(str %) columns)))
+			      (doseq [row (:rows dataset)]
+			        (. csv-w writeNext
+			          (into-array String
+			            (map
+			              #((or (get column-string-fns %) str-fn) (get row %))
+			              columns))))))))
+
+(defn
+  #^{:doc "Save to CSV using the opencsv library.
+The options are:
+  :quote-char (\")
+  :delim (,)
+  :str-fns (empty map)
+
+The :str-fns option allows for custom toString functions for each column."}
+  save-pedantic [
+    #^incanter.core/dataset dataset
+    #^String filename
+    & options]
+  (let [opts (when options (apply assoc {} options))
+        output-w (java.io.FileWriter. (java.io.File. filename))
+        quote-char (or (:quote-char opts) \")
+        delim (or (:delim opts) \,)
+        column-string-fns (or (:string-fns opts) {})]
+        (save-pedantic-internal dataset output-w :quote-char quote-char :delim delim :string-fns column-string-fns)))
 
 (defn read-map 
 [& keys] 
