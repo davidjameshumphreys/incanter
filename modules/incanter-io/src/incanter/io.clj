@@ -223,6 +223,17 @@ The :str-fns option allows for custom toString functions for each column."}
         column-string-fns (or (:string-fns opts) {})]
         (save-pedantic-internal dataset output-w :quote-char quote-char :delim delim :string-fns column-string-fns)))
 
+
+(defmethod save java.awt.image.BufferedImage
+  ([img filename & options]
+     (javax.imageio.ImageIO/write img 
+				  "png" 
+				  (.getAbsoluteFile (java.io.File. filename)))))
+
+
+
+
+
 (defn read-map 
 [& keys] 
   (into {} (for [k keys] [k (comp eval read-string)]))) 
