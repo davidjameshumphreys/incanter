@@ -195,14 +195,14 @@ incanter.io
         column-string-fns (or (:string-fns opts) {})
         str-fn #(str %)]
         (with-open [csv-w (CSVWriter. output-w delim quote-char)]
-			    (do
-			      (. csv-w writeNext (into-array String (map #(str %) columns)))
-			      (doseq [row (:rows dataset)]
-			        (. csv-w writeNext
-			          (into-array String
-			            (map
-			              #((or (get column-string-fns %) str-fn) (get row %))
-			              columns))))))))
+          (do
+            (. csv-w writeNext (into-array String (map #(str %) columns)))
+            (doseq [row (:rows dataset)]
+              (. csv-w writeNext
+                (into-array String
+                  (map
+                    #((or (get column-string-fns %) str-fn) (get row %))
+                    columns))))))))
 
 (defn
   #^{:doc "Save to CSV using the opencsv library.
