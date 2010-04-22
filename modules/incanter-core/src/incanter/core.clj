@@ -35,13 +35,13 @@
            (cern.colt.matrix.tdouble DoubleMatrix2D
                                      DoubleFactory2D
                                      DoubleFactory1D)
-           (cern.colt.matrix.tdouble.algo DoubleAlgebra
+           (cern.colt.matrix.tdouble.algo DenseDoubleAlgebra
                                           DoubleFormatter)
-           (cern.colt.matrix.tdouble.algo.decomposition DoubleCholeskyDecomposition
-                                                        DoubleSingularValueDecompositionDC
-                                                        DoubleEigenvalueDecomposition
-                                                        DoubleLUDecomposition
-                                                        DoubleQRDecomposition)
+           (cern.colt.matrix.tdouble.algo.decomposition DenseDoubleCholeskyDecomposition
+                                                        DenseDoubleSingularValueDecomposition
+                                                        DenseDoubleEigenvalueDecomposition
+                                                        DenseDoubleLUDecomposition
+                                                        DenseDoubleQRDecomposition)
            (cern.jet.math.tdouble DoubleFunctions DoubleArithmetic)
            (cern.colt.function.tdouble DoubleDoubleFunction DoubleFunction)
            (cern.colt.list.tdouble DoubleArrayList)
@@ -730,8 +730,8 @@
 "
   ([#^Matrix A & B]
    (if B
-    (Matrix. (.solve (DoubleAlgebra.) A (first B)))
-    (Matrix. (.inverse (DoubleAlgebra.) A)))))
+    (Matrix. (.solve (DenseDoubleAlgebra.) A (first B)))
+    (Matrix. (.inverse (DenseDoubleAlgebra.) A)))))
 
 
 
@@ -743,8 +743,8 @@
     http://en.wikipedia.org/wiki/LU_decomposition
     http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleLUDecomposition.html
 "
-  ;([mat] (.det (cern.colt.matrix.linalg.LUDecomposition. mat))))
-  ([mat] (.det DoubleAlgebra/DEFAULT mat)))
+  ;([mat] (.det (cern.colt.matrix.linalg.DenseLUDecomposition. mat))))
+  ([mat] (.det DenseDoubleAlgebra/DEFAULT mat)))
 
 
 (defn trace
@@ -752,9 +752,9 @@
 
   References:
     http://en.wikipedia.org/wiki/Matrix_trace
-    http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/DoubleAlgebra.html
+    http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/DenseDoubleAlgebra.html
 "
-  ([mat] (.trace DoubleAlgebra/DEFAULT mat)))
+  ([mat] (.trace DenseDoubleAlgebra/DEFAULT mat)))
 
 
 
@@ -858,7 +858,7 @@
 
   Returns:
     a matrix of the triangular factor (note: the result from
-    cern.colt.matrix.linalg.CholeskyDecomposition is transposed so
+    cern.colt.matrix.linalg.DenseDoubleCholeskyDecomposition is transposed so
     that it matches the result return from R's chol function.
 
 
@@ -878,8 +878,8 @@
     http://en.wikipedia.org/wiki/Cholesky_decomposition
 "
   ([#^Matrix mat]
-    (.viewDice (.getL (DoubleCholeskyDecomposition. mat)))))
-    ;(Matrix. (.viewDice (.getL (CholeskyDecomposition. mat)))))
+    (.viewDice (.getL (DenseDoubleCholeskyDecomposition. mat)))))
+    ;(Matrix. (.viewDice (.getL (DenseCholeskyDecomposition. mat)))))
 
 
 
@@ -906,7 +906,7 @@
     http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleSingularValueDecompositionDC.html
 "
   ([mat]
-    (let [result (DoubleSingularValueDecompositionDC. mat, true, true)]
+    (let [result (DenseDoubleSingularValueDecomposition. mat, true, true)]
       {:S (diag (Matrix. (.getS result)))
        :U (Matrix. (.getU result))
        :V (Matrix. (.getV result))})))
@@ -934,7 +934,7 @@
     http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleEigenvalueDecomposition.html
 "
   ([mat]
-    (let [result (DoubleEigenvalueDecomposition. mat)]
+    (let [result (DenseDoubleEigenvalueDecomposition. mat)]
       {:values (diag (Matrix. (.getD result)))
        :vectors (Matrix. (.getV result))})))
 
@@ -960,7 +960,7 @@
     http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleLUDecomposition.html
 "
   ([mat]
-    (let [result (DoubleLUDecomposition. mat)]
+    (let [result (DenseDoubleLUDecomposition. mat)]
       {:L (Matrix. (.getL result))
        :U (Matrix. (.getU result))})))
 
@@ -984,12 +984,12 @@
 
   References:
     http://en.wikipedia.org/wiki/QR_decomposition
-    http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleQRDecomposition.html
+    http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DenseDoubleQRDecomposition.html
 "
   ([mat]
-    (let [result (DoubleQRDecomposition. mat)]
-      {:Q (Matrix. (.getQ result))
-       :R (Matrix. (.getR result))})))
+    (let [result (DenseDoubleQRDecomposition. mat)]
+      {:Q (Matrix. (.getQ result false))
+       :R (Matrix. (.getR result false))})))
 
 
 (defn condition
@@ -1008,7 +1008,7 @@
     http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleSingularValueDecompositionDC.html
 "
   ([mat]
-    (.cond (DoubleSingularValueDecompositionDC. mat, true, true))))
+    (.cond (DenseDoubleSingularValueDecomposition. mat, true, true))))
 
 
 (defn rank
@@ -1028,7 +1028,7 @@
     http://incanter.org/docs/parallelcolt/api/cern/colt/matrix/tdouble/algo/decomposition/DoubleSingularValueDecompositionDC.html
 "
   ([mat]
-    (.rank (DoubleSingularValueDecompositionDC. mat, true, true))))
+    (.rank (DenseDoubleSingularValueDecomposition. mat, true, true))))
 
 
 
@@ -1234,8 +1234,12 @@
                  (if (map? (query-map k))
                    (reduce _and
                            (for [sk (keys (query-map k))]
-                             (if (nil? (ops sk)) 
-                               (throw (Exception. (str "Invalid key in query-map: " sk)))
+                             (cond 
+			      (fn? sk)
+			        (sk (row k) ((query-map k) sk))
+			      (nil? (ops sk)) 
+                                (throw (Exception. (str "Invalid key in query-map: " sk)))
+			      :else
                                ((ops sk) (row k) ((query-map k) sk)))))
                    (= (row k) (query-map k)))))))))
 
@@ -1741,6 +1745,59 @@
 		     (comparator (fn [a b] (pos? (compare a b))))
 		     compare)]
        (dataset (col-names data) (sort-by key-fn comp-fn (:rows data))))))
+
+
+
+(defmacro $fn
+" A simple macro used as syntactic sugar for defining predicate functions to be used
+  in the $where function. The supplied arguments should be column names of a dataset. 
+  This macro performs map destructuring on the arguments.
+  
+  For instance, 
+  ($fn [speed] (< speed 10)) => (fn [{:keys [speed]}] (< speed 10))
+
+  Examples:
+    (use '(incanter core datasets))
+    (view ($where ($fn [speed dist] (or (> speed 20) (< dist 10))) (get-dataset :cars)))
+
+    (view ($where ($fn [speed dist] (< (/ dist speed) 2)) (get-dataset :cars)))
+
+    (use '(incanter core datasets charts))
+    (with-data (get-dataset :cars)
+      (doto (scatter-plot :speed :dist :data ($where ($fn [speed dist] (< (/ dist speed) 2))))
+        (add-points :speed :dist :data ($where ($fn [speed dist] (>= (/ dist speed) 2))))
+        (add-lines ($ :speed) (mult 2 ($ :speed)))
+        view))
+
+
+    (let [passed? ($fn [speed dist] (< (/ dist speed) 2))
+          failed? (complement passed?)]
+      (with-data (get-dataset :cars)
+        (doto (scatter-plot :speed :dist :data ($where passed?))
+          (add-points :speed :dist :data ($where failed?))
+          (add-lines ($ :speed) (mult 2 ($ :speed)))
+          view)))
+
+
+    (use '(incanter core stats charts))
+    (let [above-sine? ($fn [col-0 col-1] (> col-1 (sin col-0)))
+          below-sine? (complement above-sine?)]
+      (with-data (conj-cols (sample-uniform 1000 :min -5 :max 5) 
+                            (sample-uniform 1000 :min -1 :max 1))
+        (doto (function-plot sin -5 5)
+          (add-points :col-0 :col-1 :data ($where above-sine?))
+          (add-points :col-0 :col-1 :data ($where below-sine?))
+          view)))
+
+
+    (view ($where ($fn [] (> (rand) 0.9)) (get-dataset :cars)))
+
+    (view ($where ($fn [Species] ($in Species #{\"virginica\" \"setosa\"})) (get-dataset :iris)))
+
+"
+  ([col-bindings body]
+     `(fn [{:keys ~col-bindings}] ~body)))
+
 
 
 (defn $group-by
