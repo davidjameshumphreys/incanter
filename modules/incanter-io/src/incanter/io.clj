@@ -147,35 +147,14 @@ incanter.io
       (.flush file-writer)
       (.close file-writer))))
 
-(defn save-pedantic-internal [
-  #^incanter.core/dataset dataset
-  #^java.io.Writer output-w
-  & options]
-  (let [opts (when options (apply assoc {} options))
-        columns (:column-names dataset)
-        quote-char (or (:quote-char opts) \")
-        delim (or (:delim opts) \,)
-        column-string-fns (or (:string-fns opts) {})
-        str-fn #(str %)]
-        (with-open [csv-w (CSVWriter. output-w delim quote-char)]
-          (do
-            (. csv-w writeNext (into-array String (map #(str %) columns)))
-            (doseq [row (:rows dataset)]
-              (. csv-w writeNext
-                (into-array String
-                  (map
-                    #((or (get column-string-fns %) str-fn) (get row %))
-                    columns))))))))
-
-(defn
-  #^{:doc "Save to CSV using the opencsv library.
+(defn #^{:doc "Save to CSV using the opencsv library.
 The options are:
-  :quote-char (\")
+  :quote-char default (\")
   :delim (,)
   :str-fns (empty map)
 
 The :str-fns option allows for custom toString functions for each column."}
-  save-pedantic [
+  save-extended [
     #^incanter.core/dataset dataset
     #^String filename
     & options]
@@ -183,9 +162,16 @@ The :str-fns option allows for custom toString functions for each column."}
         output-w (java.io.FileWriter. (java.io.File. filename))
         quote-char (or (:quote-char opts) \")
         delim (or (:delim opts) \,)
-        column-string-fns (or (:string-fns opts) {})]
-        (save-pedantic-internal dataset output-w :quote-char quote-char :delim delim :string-fns column-string-fns)))
-
+        column-string-fns (or (:string-fns opts) {})
+        str-fn #(str %)
+        columns (:column-names dataset)]
+          (with-open [csv-w (CSVWriter. output-w delim quote-char)]
+             (do
+               (. csv-w writeNext (into-array String (map #(str %) columns)))
+               (doseq [row (:rows dataset)]
+                  (. csv-w writeNext
+                     (into-array String
+                        (map #((or (get column-string-fns %) str-fn) (get row %)) columns))))))))
 
 (defmethod save java.awt.image.BufferedImage
   ([img filename & options]

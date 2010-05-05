@@ -80,20 +80,3 @@
   (is (= (first iris-mat-dummies) (matrix [5.10 3.50 1.40 0.20 0 0] 6)))
 
 ) ;; end of io-validation tests
-
-
-(defn- tst-ped [ds expected-string]
-  (is (= expected-string
-         (let [output-string (java.io.StringWriter.)]
-           (do
-             (save-pedantic-internal
-              ds
-              output-string
-              :quote-char \')
-              (. (. output-string getBuffer) toString))))))
-
-(deftest test-basic-pedantic
-  (tst-ped (dataset ["a" "b"] [["A,B" 2] [3 4]]) "'a','b'\n'A,B','2'\n'3','4'\n"))
-
-(deftest test-other-pedantic
-  (tst-ped (dataset ["a" "b"] [[nil 2] [3 4]]) "'a','b'\n'','2'\n'3','4'\n"))
