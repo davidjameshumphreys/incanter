@@ -16,7 +16,7 @@
 
 
 
-(ns #^{:doc "This is the core statistical library for Incanter.
+(ns ^{:doc "This is the core statistical library for Incanter.
             It provides probability functions (cdf, pdf, quantile),
             random number generation, statistical tests, basic
             modeling functions, similarity/association measures,
@@ -29,7 +29,6 @@
             "
        :author "David Edgar Liebke and Bradford Cross"}
   incanter.stats
-  ;(:gen-class)
   (:import (cern.colt.list.tdouble DoubleArrayList)
            (cern.jet.random.tdouble Gamma Beta Binomial ChiSquare DoubleUniform
                                     Exponential NegativeBinomial Normal Poisson
@@ -272,7 +271,7 @@
   Example:
       (sample-normal 1000 :mean -2 :sd (sqrt 0.5))
 "
-  ([#^Integer size & options]
+  ([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           mean (or (:mean opts) 0)
           sd (or (:sd opts) 1)]
@@ -322,7 +321,7 @@
     http://en.wikipedia.org/wiki/Multivariate_normal
 
 "
-([#^Integer size & options]
+([^Integer size & options]
    (let [opts (when options (apply assoc {} options))
          mean (or (:mean opts)
                   (if (:sigma opts)
@@ -426,7 +425,7 @@
       (sample-uniform 1000)
       (sample-uniform 1000 :min 1 :max 10)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           min-val (double (or (:min opts) 0.0))
           max-val (double (or (:max opts) 1.0))
@@ -530,7 +529,7 @@
   Example:
       (sample-beta 1000 :alpha 1 :beta 2)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           alpha (or (:alpha opts) 1)
           beta (or (:beta opts) 1)]
@@ -626,7 +625,7 @@
   Example:
       (sample-gamma 1000 :shape 1 :rate 2)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           shape (or (:shape opts) 1)
           rate (or (:rate opts) 1)]
@@ -719,7 +718,7 @@
   Example:
       (sample-chisq 1000 :df 2)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           df (or (:df opts) 1)]
       (if (= size 1)
@@ -1047,7 +1046,7 @@
 
 
 "
-([#^Integer size alpha]
+([^Integer size alpha]
     (let [W (trans (for [a alpha] (sample-gamma size :shape a :rate 1)))
           T (map sum W)]
       (matrix (map #(div %1 %2) W T)))))
@@ -1148,7 +1147,7 @@
   Example:
       (sample-binomial 1000 :prob 1/4 :size 20)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           n (or (:size opts) 1)
           p (or (:prob opts) 1/2)]
@@ -1291,7 +1290,7 @@
   Example:
       (sample-poisson 1000 :lambda 10)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           lambda (or (:lambda opts) 1)]
      (if (= size 1)
@@ -1386,7 +1385,7 @@
   Example:
       (sample-neg-binomial 1000 :prob 1/2 :size 20)
 "
-([#^Integer size & options]
+([^Integer size & options]
     (let [opts (when options (apply assoc {} options))
           size (or (:size opts) 10)
           prob (or (:prob opts) 1/2)]
@@ -1965,14 +1964,14 @@
       http://en.wikipedia.org/wiki/Resampling_(statistics)
 
 "
-([#^Integer n x]
+([^Integer n x]
     (loop [samp '() i 0]
       (if (= i n)
           samp
           (recur
             (conj samp (sample x)) (inc i)))))
 
-([#^Integer n x y]
+([^Integer n x y]
    (let [pool (concat x y)
          m1 (count x)]
      (loop [samp-x '() samp-y '() i 0]
