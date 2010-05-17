@@ -80,3 +80,19 @@
   (is (= (first iris-mat-dummies) (matrix [5.10 3.50 1.40 0.20 0 0] 6)))
 
 ) ;; end of io-validation tests
+
+  
+(deftest extended-roundtrip
+  (let [ffile (File/createTempFile "extended-test" ".csv")
+       fname (. ffile getAbsolutePath)]
+  (try
+     (let [cols ["Ints" "Doubles" "Strings" "Dates"]
+           dset (dataset
+            cols
+            [
+             [1 (Math/sqrt 2) "One" (Date.)]
+             [2 Math/E "Two" (Date.)]
+             [3 Math/PI "Three" (Date.)]])]
+        (do
+          (save-extended dset fname))))
+      (finally (comment (. ffile delete)))))
