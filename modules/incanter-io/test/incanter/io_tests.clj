@@ -24,7 +24,8 @@
 
 (ns incanter.io-tests
   (:use clojure.test 
-        (incanter core io)))
+        (incanter core io))
+  (:import java.lang.Math java.io.File java.util.Date))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UNIT TESTS FOR incanter.io.clj
@@ -81,18 +82,23 @@
 
 ) ;; end of io-validation tests
 
-  
-(deftest extended-roundtrip
-  (let [ffile (File/createTempFile "extended-test" ".csv")
-       fname (. ffile getAbsolutePath)]
-  (try
-     (let [cols ["Ints" "Doubles" "Strings" "Dates"]
-           dset (dataset
+(def cols ["Ints" "Doubles" "Strings" "Dates"])
+(def dset (dataset
             cols
             [
              [1 (Math/sqrt 2) "One" (Date.)]
              [2 Math/E "Two" (Date.)]
-             [3 Math/PI "Three" (Date.)]])]
-        (do
-          (save-extended dset fname))))
-      (finally (comment (. ffile delete)))))
+             [3 Math/PI "Three" (Date.)]]))
+(deftest extended-roundtrip
+  (let [ffile (File/createTempFile "extended-test" ".csv")
+       fname (. ffile getAbsolutePath)]
+  (try
+     (do
+       (save-extended dset fname)
+       (let [input-file (read-dataset fname :header true)]
+       	    (is (= (map keyword cols) (:column-names input-file)))
+	    (is (= 1 (get (first (:rows input-file)) :Ints)))
+	    )
+       ;TODO fill in tests.
+       )
+      (finally (. ffile delete)))))
