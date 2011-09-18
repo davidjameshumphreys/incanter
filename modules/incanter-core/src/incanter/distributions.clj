@@ -24,7 +24,8 @@
   (:use [clojure.contrib.def :only (defvar defvar-)]
         [clojure.set :only (intersection)]
         [clojure.contrib.combinatorics :only (combinations)]
-        [incanter.core :only (gamma pow regularized-beta)]))
+        [incanter.core :only (gamma pow regularized-beta)]
+        [incanter.stats :only [sd]]))
 
 ;; NOTE: as of this writing, (doc pdf/cdf/...) do not show the doc strings.
 ;; including them for when this bug is fixed.
@@ -793,3 +794,28 @@
     (pdf (uniform-distribution 1.0 10.0) 5)"
   ([] (uniform-distribution 0.0 1.0)) ; since "0 1" not implicitly promoted, otheriwse no matching ctor...
   ([min max] (DoubleUniform-rec. min max)))
+
+(defn inverse-chisq [n df]
+  (let [hdf (/ df 2)]
+    (*
+     (/ (pow hdf hdf)
+        (gamma hdf))
+     (pow n (- -1 hdf))
+     (Math/exp (/ hdf (- n))))
+    ))
+
+(defn test-mean [expected-mean
+                 confidence-interval
+                 coll]
+  (let [m (mean coll)
+        s (incanter.stats/sd coll )
+        n (count coll)
+        t-stat (/
+                (* n (* (- m expected-mean) (- m expected-mean)))
+                (* s s))
+        inverse-confidence-interval (inverse-chisq confidence-interval 1)]
+    (not (> t-stat inverse-confidence-interval))
+    ;;inverse-chisq function
+    ))
+
+
