@@ -51,7 +51,7 @@
            (javax.swing JTable JScrollPane JFrame)
            (java.util Vector)))
 
-
+(set! *warn-on-reflection* true)
 (def ^{:dynamic true
        :doc "This variable is bound to a dataset when the with-data macro is used.
               functions like $ and $where can use $data as a default argument."} 
@@ -165,7 +165,7 @@
 
 
 "
-   ([m]
+   ([^Matrix m]
     (cond
      (matrix? m)
       (seq (.toArray (.diagonal DoubleFactory2D/dense m)))
@@ -292,7 +292,7 @@
                 cols cols
                 except-cols (except-for (.columns mat) except-cols)
                 :else true)
-         mat (if (nil? filter) mat (matrix (filter filter mat)))
+         ^Matrix mat (if (nil? filter) mat (matrix (filter filter mat)))
          all-rows? (or (true? rows) (= rows :all))
          all-cols? (or (true? cols) (= cols :all))]
      (cond
@@ -1397,7 +1397,7 @@
 altering later ones."
   ([coll] (make-unique coll #{}))
   ([coll seen]
-     (let [new-name (fn new-name [x]
+     (let [new-name (fn new-name [^clojure.lang.Keyword x]
                       (if (not (contains? seen x))
                         x
                         (let [match (re-matches #"(.*\-)([0-9]+)" (.getName x))]
@@ -2767,13 +2767,13 @@ of each type"
 
 (defn separate-blocks
   "Partitions should be a sequence of [start,size] pairs."
-  [matrix partitions]
+  [^Matrix matrix partitions]
   (for [p partitions]
     (for [q partitions]
       (.viewPart matrix (first p) (first q) (second p) (second q)))))
 
 (defn diagonal-blocks
   "Partitions should be a sequence of [start,size] pairs."
-  [matrix partitions]
+  [^Matrix matrix partitions]
   (for [p partitions]
     (.viewPart matrix (first p) (first p) (second p) (second p))))
