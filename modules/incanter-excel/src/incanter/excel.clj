@@ -10,7 +10,7 @@ Excel file formats (.xls and .xlsx)."
    [incanter.core :only [dataset get-input-stream dataset?]]
    [incanter.excel.cells :only [read-line-values write-line-values]]
    [incanter.excel.workbook :only [get-workbook-sheet make-workbook-map write-workbook create-workbook-object create-sheet get-all-sheets]]))
-
+(set! *warn-on-reflection* true)
 (defn- commit-sheet!
   "Internally save the dataset into the :sheet object."
   [workbook-blob dataset use-bold]
@@ -152,5 +152,5 @@ or :xlsx override the suffix check.
     (let [workbook (create-workbook-object filename override-format in-fs)]
      (if all-sheets?
        (for [current-sheet (get-all-sheets workbook)]
-         (let [rows-it   (iterator-seq (. current-sheet iterator))]
+         (let [rows-it   (iterator-seq (. ^java.util.Iterator current-sheet iterator))]
            (read-sheet rows-it header-keywords)))))))
